@@ -185,8 +185,8 @@ table `sponsors`
 
 ```
 id 
-user_id
-client_id
+model_id
+viwer_id
 created_at
 updated_at
 ```
