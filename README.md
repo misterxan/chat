@@ -127,7 +127,7 @@ Response:
 	"success": "false", "message":"anauthorized"
 }
 400: {
-	"success": "false", "message":"bad params"
+	"success": "false", "message":"no more than one goal"
 }
 ```
 
@@ -284,6 +284,11 @@ updated_at
 	[
 		"UpdateGoal" => UpdateGoalListener
 	],
+"UpdateGoal" => 
+	[
+		"SendUpdateGoal" => SendUpdateGoalListener
+	],
+
 "EndGoal" => 
 	[
 		"SendEventToQueue" => SendEndGoalToQueue
@@ -331,7 +336,11 @@ updated_at
 
 #### Событие `ReceiveMoney`
 
-* UpdateGoalListener - оперирует с моделью Donate осуществляет обновление целей (прибавляет сумму) у модели. Может породить событие достижение цели.
+* UpdateGoalListener - оперирует с моделью Donate осуществляет обновление целей в бд (если она имеется) (прибавляет сумму) у модели. Обычно генерирует событие `UpdateGoal`, если цель существует и она не завершена. При завершении цели отправляет событие `EndGoal`.
+
+#### Событие `UpdateGoal`
+
+* SendUpdateGoalListener - отправляет событие о обновлении цели.
 
 #### Событие `EndGoal`
 
@@ -381,4 +390,4 @@ updated_at
 * [POST][PUT][DELETE][GET] ` /user/{user_id}/goals...`
 	#### Основная логика
 	
-	CRUD на цели модели
+	CRUD на цели модели. Ограничение на одну цель. 
