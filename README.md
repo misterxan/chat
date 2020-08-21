@@ -113,7 +113,7 @@ response:
 Цели
 
 ```
-POST /user/{user_id}/goals
+POST /chat/goals
 Request:
 {
 	"require_sum": "1000"
@@ -132,7 +132,7 @@ Response:
 ```
 
 ```
-GET /user/{user_id}/goals
+GET /chat/goals
 Response:
 200: {
 	goals: [{
@@ -150,7 +150,7 @@ Response:
 ```
 
 ```
-PUT /user/{user_id}/goals/{goal_id}
+PUT /chat/goals/{goal_id}
 Response:
 204: {
 	{
@@ -168,7 +168,7 @@ Response:
 
 
 ```
-DELETE /user/{user_id}/goals/{goal_id}
+DELETE /chat/goals/{goal_id}
 Response:
 204:
 401: {
@@ -284,11 +284,18 @@ updated_at
 	[
 		"UpdateGoal" => UpdateGoalListener
 	],
+"CreateGoal" => 
+	[
+		"SendCreateGoal" => SendCreateGoalListener,
+	],
 "UpdateGoal" => 
 	[
 		"SendUpdateGoal" => SendUpdateGoalListener
 	],
-
+"DeleteGoal" => 
+	[
+		"SendDeleteGoal" => SendDeleteGoalListener
+	],
 "EndGoal" => 
 	[
 		"SendEventToQueue" => SendEndGoalToQueue
@@ -338,9 +345,17 @@ updated_at
 
 * UpdateGoalListener - оперирует с моделью Donate осуществляет обновление целей в бд (если она имеется) (прибавляет сумму) у модели. Обычно генерирует событие `UpdateGoal`, если цель существует и она не завершена. При завершении цели отправляет событие `EndGoal`.
 
+#### Событие `CreateGoal`
+
+* SendCreateGoalListener - отправляет событие о создании цели, на фронт
+
+#### Событие `DeleteGoal`
+
+* SendDeleteGoalListener - отправляет событие о удалении цели, на фронт
+
 #### Событие `UpdateGoal`
 
-* SendUpdateGoalListener - отправляет событие о обновлении цели.
+* SendUpdateGoalListener - отправляет событие о обновлении цели, на фронт
 
 #### Событие `EndGoal`
 
@@ -387,7 +402,10 @@ updated_at
 	
 	При получении списка событий мы проверяеем наличие по ключу в редисе. Если ключа нет, мы создаем кеш по ключу. Логика добавления такая - делаем запрос с джойнами во все события, сортируем по времени, отсекаем по времени, ставим лимит. Записываем в кеш. Есть вариант унифицировать все события в одной таблице и ее кешировать при отсутствии ключа и инвалидировать при сохранении истории.
 
-* [POST][PUT][DELETE][GET] ` /user/{user_id}/goals...`
+* [POST][PUT][DELETE][GET] ` /chat/goals...`
 	#### Основная логика
 	
-	CRUD на цели модели. Ограничение на одну цель. 
+	CRUD на цели модели. При создании действует ограничение на одну цель. При обновлении цели стоит учесть что сумма сбора не может быть меньше уже собранной суммы.
+	Создание цели генерирует событие `CreateGoal` - для отправки уведомления о создании новой цели.
+	Обновление цели генерирует событие `UpdateGoal` - для обновления цели на фронте, например увеличить или уменьшить сумму сбора.
+	Удаление цели генерирует событие `DeleteGoal` - для удаления текущей цели на фронте
