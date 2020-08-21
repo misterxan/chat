@@ -110,6 +110,75 @@ response:
 }
 ```
 
+Цели
+
+```
+POST /user/{user_id}/goals
+Request:
+{
+	"require_sum": "1000"
+	"name": "Na Webku"
+}
+Response:
+201: {
+	success: ok
+}
+401: {
+	"success": "false", "message":"anauthorized"
+}
+400: {
+	"success": "false", "message":"bad params"
+}
+```
+
+```
+GET /user/{user_id}/goals
+Response:
+200: {
+	goals: [{
+	   "name": "bla",
+	   "sum" : "1000",
+	   "require_sum": "2000"
+	}]
+}
+401: {
+	"success": "false", "message":"anauthorized"
+}
+400: {
+	"success": "false", "message":"bad params"
+}
+```
+
+```
+PUT /user/{user_id}/goals/{goal_id}
+Response:
+204: {
+	{
+	   "name": "blaBLA",
+	   "require_sum": "2000"
+	}
+}
+401: {
+	"success": "false", "message":"anauthorized"
+}
+400: {
+	"success": "false", "message":"bad params"
+}
+```
+
+
+```
+DELETE /user/{user_id}/goals/{goal_id}
+Response:
+204:
+401: {
+	"success": "false", "message":"anauthorized"
+}
+400: {
+	"success": "false", "message":"bad params"
+}
+```
+
 ## Описание моделей и таблиц:
 
 ### Пользовательская часть
@@ -308,3 +377,8 @@ updated_at
 	#### Логика
 	
 	При получении списка событий мы проверяеем наличие по ключу в редисе. Если ключа нет, мы создаем кеш по ключу. Логика добавления такая - делаем запрос с джойнами во все события, сортируем по времени, отсекаем по времени, ставим лимит. Записываем в кеш. Есть вариант унифицировать все события в одной таблице и ее кешировать при отсутствии ключа и инвалидировать при сохранении истории.
+
+* [POST][PUT][DELETE][GET] ` /user/{user_id}/goals...`
+	#### Основная логика
+	
+	CRUD на цели модели
