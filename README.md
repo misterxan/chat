@@ -22,7 +22,7 @@
 Добавление сообщения
 
 ```
-POST /chat/message/add
+POST /chat/message
 Request:
 {
 	"message": "hello"
@@ -43,7 +43,7 @@ Response:
 Добавление доната:
 
 ```
-POST /chat/donat/add
+POST /chat/donat
 request:
 {
 	"sum": 15.5,
@@ -67,7 +67,7 @@ response:
 Регистрация коннекта:
 
 ```
-POST /chat/connection/add
+POST /chat/connection
 request:
 {
 	"connection_id": "uuid",
@@ -114,36 +114,16 @@ response:
 
 ### Пользовательская часть
 
-* User (сама webcam модель)
+* User
 table `users`
 ```
 id (uint)
 uuid
 name (varchar)
-account_id (uint)
-created_at
-updated_at
-```
-
-* Client (зритель)
-table `clients`
-```
-id (uint)
-uuid
-name (varchar)
-account_id (uint)
-created_at
-updated_at
-```
-### Часть связанная с деньгами
-
-* Account (счет пользователя или модели связь 1-1 аккаунт может быть один)
-table `accounts`
-```
-id (uint)
 login
 password
 balance
+role
 created_at
 updated_at
 ```
@@ -179,6 +159,8 @@ table `messages`
 ```
 id
 is_public (bool)
+receiver_id
+sender_id
 value (text)
 created_at
 updated_at
@@ -308,12 +290,12 @@ updated_at
 
 
 
-* [POST] `/chat/donate/add`
+* [POST] `/chat/donate`
 	#### Основное действие:
 
 	Порождает событие `AddNewDonate`. Существуют четыре обработчика событий. `SaveDonateListener` - сохраняет донат в бд и порождает событие `AddNewMessage` при необходимости (донат с комментарием). `CalculateNewSponsor` - рассчитывает нового спонсора и может порождать событие `NewSponsor`. `SendDonateToQueeuListener` - отправляет событие доната в очередь на отправку в вебсокет. И заключительное событие отправляет деньги с одного счета на другой.
 
-* [POST] `/chat/connection/add`
+* [POST] `/chat/connection`
 	#### Основное действие:
 
 	Порождает событие `AddNewConnection`. Составляет связь между connection_id owner_id в ws и uuid пользователя и модели. 
